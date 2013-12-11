@@ -4,15 +4,27 @@
 
 {% block extra_css %}
 <link rel="stylesheet" href="{% static 'tuberias/css/index.css' %}">
+<!-- API google maps -->
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false"></script>
 {% endblock %}
 
 {% block extra_js %}
 <script src="{% static 'tuberias/js/index.js' %}"></script>
+<script src="{% static 'tuberias/js/mapa.js' %}"></script>
+<script src="{% static 'tuberias/js/subterraneo.js' %}"></script>
 {% endblock %}
 
 {% block content %}
 
 <h4>Sistema de tuberías</h4>
+<div id="tuberias">
+	<div class="col-md-6">
+		{% include "tuberias/mapa.html" %}
+	</div>
+	<div class="col-md-6">
+		{% include "tuberias/subterraneo.html" %}
+	</div>
+</div>
 Suma mediante ajax
 <div id="mapa">
 <input type="text" id="nro1" /> +
