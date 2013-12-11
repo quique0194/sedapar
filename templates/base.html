@@ -1,0 +1,34 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>{% block title %}Sedapar{% endblock %}</title>
+
+	<meta charset="utf-8"> 
+
+	<!-- jQuery -->
+	<script src="//code.jquery.com/jquery-1.10.2.min.js"></script>	
+
+	<!-- bootstrap -->
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js"></script>
+
+	<!-- my-css -->
+	<link rel="stylesheet" href="{% static 'css/base.css' %}">
+	{% block extra_css %}{% endblock %}
+
+	<!-- my-js -->
+	<script src="{% static 'js/base.js' %}"></script>
+	{% block extra_js %}{% endblock %}
+
+</head>
+<body>
+	<div class="container">
+		<a href="{% url 'index' %}"><h1>Sedapar</h1></a>
+		<hr>
+		{% block content %}{% endblock %}
+	</div>
+</body>
+</html>
