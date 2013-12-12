@@ -28,13 +28,18 @@ function crear_tubo(){
 	return polyline;
 }
 
-function guardar_tubo(id,tubo){
-	str = "";
+function point_tostr(tubo){
+	var str = "";
 	tubo.getPath().forEach(function(item){
 		str += item;
 	});
+	return str;
+}
+
+function guardar_tubo(id,tubo){
+	str = point_tostr(tubo);
 	if(id == 0){
-		console.log("creando "+str);		
+		console.log("Creando :"+str);		
 		++id_count;
 		console.log("Id: "+id_count);
 		return id_count;
@@ -77,31 +82,34 @@ function make_editable(id, tubo){
 		guardar_tubo(id,tubo);
 	});
 
-	var path = tubo.getPath();
-	var add_node_listener = google.maps.event.addListener(path, 'insert_at', function(i){
+	var add_node_listener = google.maps.event.addListener(tubo.getPath(), 'insert_at', function(i){
+		var path = tubo.getPath();
+		console.log("kike es: "+point_tostr(tubo));
 		if( confirm("Dividir en 2 tubos?") ){
-			console.log(1);
-			ntubo = crear_tubo();
-			console.log(2);
-			var v3 = path.pop();
-			console.log(4);
-			ntubo.getPath().push(path.getAt(1));
-			console.log(5);
-			ntubo.getPath().push(v3);
-			console.log(1);
-			guardar_tubo(id,tubo);
-			console.log(7);
-			nid = guardar_tubo(0,ntubo);
-			console.log(1);
-			make_selectable(nid,ntubo);
-			console.log(9);
-			make_editable(nid,ntubo);
-			console.log(1);
+			hide_tubo(tubo);
+			var tubo1 = crear_tubo();
+			var tubo2 = crear_tubo();
+			tubo1.getPath().push(path.getAt(0));
+			tubo1.getPath().push(path.getAt(1));
+			tubo2.getPath().push(path.getAt(1));
+			tubo2.getPath().push(path.getAt(2));
+			guardar_tubo(id,tubo1); 
+			nid = guardar_tubo(0,tubo2);
+			make_selectable(id,tubo1);
+			make_editable(id,tubo1);
+			make_selectable(nid,tubo2);
+			make_editable(nid,tubo2);
+			select_tubo(id, tubo1);
 		}
 		else{
-			console.log("antes");
-			tubo.getPath().removeAt(1);
-			console.log("despues");
+			hide_tubo(tubo);
+			var tubo1 = crear_tubo();
+			tubo1.getPath().push(path.getAt(0));
+			tubo1.getPath().push(path.getAt(2));
+			guardar_tubo(id,tubo1); 
+			make_selectable(id,tubo1);
+			make_editable(id,tubo1);
+			select_tubo(id, tubo1);
 		}
 	});
 }
@@ -136,12 +144,16 @@ function draw_tubo(){
 	});
 }
 
+function hide_tubo(tubo){
+	tubo.setVisible(false);
+}
+
 function eliminar_tubo(){
 	if(selected){
 		if(selected.getVisible() ){
 			if( confirm("Seguro que quiere eliminar el tubo seleccionado?") ){
 				console.log("eliminando tubo id: "+selected_id);
-				selected.setVisible(false);
+				hide_tubo(selected);
 			}
 		}
 	}
