@@ -56,6 +56,8 @@ function guardar_tubo(id,tubo){
 
 function select_tubo(id,polyline){
 	console.log("selected id: "+id);
+	if( id )
+		$("#eliminar_tubo").removeAttr('disabled');
 	if(selected){
 		if( selected == polyline ){
 			selected_id = id;
@@ -67,7 +69,8 @@ function select_tubo(id,polyline){
 	selected = polyline;
 	selected_id = id;
 	selected.set('strokeColor', selected_color);
-	selected.setEditable(true); 	
+	selected.setEditable(true);
+	
 }
 
 function make_selectable(id, tubo){
@@ -116,10 +119,11 @@ function make_editable(id, tubo){
 
 function draw_tubo(){
 	$("#nuevo_tubo").attr('disabled', true);
+	$("#eliminar_tubo").attr('disabled', true);
 	var polyline = crear_tubo();
-	select_tubo(0,polyline);
 
 	var listener_click = google.maps.event.addListener(map, 'click', function(e){
+		select_tubo(0,polyline);
 		var path = polyline.getPath();
 		path.push(e.latLng);
 		path.push(e.latLng);	
@@ -154,8 +158,17 @@ function eliminar_tubo(){
 	if(selected){
 		if(selected.getVisible() ){
 			if( confirm("Seguro que quiere eliminar el tubo seleccionado?") ){
-				console.log("eliminando tubo id: "+selected_id);
+				$.ajax({
+				    type: "GET",
+				    url: "eliminar_tubo/?"+"id="+selected_id,
+				    async: false
+				})
 				hide_tubo(selected);
+				console.log("eliminado id: "+selected_id);
+				selected = null;
+				selected_id = null;
+				$("#eliminar_tubo").attr('disabled', true);
+				
 			}
 		}
 	}
@@ -196,6 +209,7 @@ map = new google.maps.Map(document.getElementById('mapa'), options);
 
 $("#nuevo_tubo").click(draw_tubo);
 $("#eliminar_tubo").click(eliminar_tubo);
+$("#eliminar_tubo").attr('disabled', true);
 
 cargar_tubos();
 

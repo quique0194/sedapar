@@ -17,7 +17,6 @@ def mapa(request):
 			json += '{ "id":"'+str(tubo.id)+'" ,"tubo":'+tubo.tubo.json+ '},'
 		json = json[:-1]
 		json += "]}"
-		print "JSON: "+json
 		return HttpResponse(json)
 
 
@@ -41,4 +40,10 @@ def guardar_tubo(request):
 			return HttpResponse(json)
 
 def eliminar_tubo(request):
-	return HttpResponse()
+	if request.method == 'GET':
+		GET = request.GET
+		if GET.has_key('id'):
+			id = int(GET['id'])
+			tubo = Tubo.objects.get(pk=id)
+			tubo.delete()
+		return HttpResponse()
