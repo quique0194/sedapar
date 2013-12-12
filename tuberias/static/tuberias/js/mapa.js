@@ -21,14 +21,24 @@ function crear_tubo(){
 	});
 
 	var select_click = google.maps.event.addListener(polyline, 'click', function(c){
-		select_tubo(polyline);
+		select_tubo(polyline, 0);
 	});
 
 	return polyline;
 }
 
-function select_tubo(polyline){
+function guardar_tubo(tubo){
+	str = "";
+	tubo.getPath().forEach(function(item){
+		str += item;
+	});
+	console.log("guardando "+str);	
+}
+
+function select_tubo(polyline, force){
 	if(selected){
+		if( selected == polyline && !force )
+			return;
 		selected.set('strokeColor', unselected_color);
 		selected.setDraggable(false);
 		selected.setEditable(false);
@@ -38,23 +48,31 @@ function select_tubo(polyline){
 	selected.set('strokeColor', selected_color);
 	selected.setDraggable(true);
 	selected.setEditable(true);
-	var edit_listener = google.maps.event.addListener(selected, 'mouseover', function(){
-		var path = selected.getPath();
-		if( path.getLength() == 3 )
-			if( confirm("Desea dividir el tubo en 2?") ){
-				ultimo = selected.getPath().pop();
-				medio = selected.getPath().pop();
-				n = crear_tubo();
-				selected.getPath().push(medio);
-				n.getPath().push(medio);
-				n.getPath().push(ultimo);
-			}
-			else{
-				ultimo = selected.getPath().pop();
-				medio = selected.getPath().pop();
-				selected.getPath().push(ultimo);
-			}
-			
+	console.log("select");
+
+	var edit_listener = google.maps.event.addListenerOnce(selected, 'mouseup', function(){
+		console.log("mouseup");
+		var result_listener = google.maps.event.addListenerOnce(selected, 'mouseout', function(){			
+			var path = selected.getPath();
+			if( path.getLength() == 3 )
+				if( confirm("Desea dividir el tubo en 2?") ){
+					ultimo = selected.getPath().pop();
+					medio = selected.getPath().pop();
+					n = crear_tubo();
+					selected.getPath().push(medio);
+					n.getPath().push(medio);
+					n.getPath().push(ultimo);
+					console.log("select otro");
+					guardar_tubo(n);
+				}
+				else{
+					ultimo = selected.getPath().pop();
+					medio = selected.getPath().pop();
+					selected.getPath().push(ultimo);
+				}
+			guardar_tubo(selected);
+			select_tubo(selected, 1);
+		});
 	});
 }
 
@@ -64,7 +82,9 @@ function draw_tubo(){
 	var polyline = crear_tubo();
 
 	var listener_click = google.maps.event.addListener(map, 'click', function(e){
-		select_tubo(polyline);
+		polyline.set('strokeColor', selected_color);
+		polyline.setDraggable(true);
+		polyline.setEditable(true);
 		var path = polyline.getPath();
 		path.push(e.latLng);
 		path.push(e.latLng);	
@@ -76,19 +96,25 @@ function draw_tubo(){
 		});
 
 		var listener_click2 = google.maps.event.addListener(polyline, 'click', function(c){
-			str = "";
-			path.forEach(function(item){
-				str += item;
-			});
-			alert(str);
 			google.maps.event.removeListener(listener_click2);
 			google.maps.event.removeListener(listener_move);
 			google.maps.event.removeListener(listener_click);
+			guardar_tubo(polyline);
 		});
 
 	});
 }
 
+function eliminar_tubo(){
+	if(selected){
+		if(selected.getVisible() ){
+			if( confirm("Seguro que quiere eliminar el tubo seleccionado?") ){
+				console.log("eliminando tubo");
+				selected.setVisible(false);
+			}
+		}
+	}
+}
 
 
 // document ready
@@ -107,7 +133,6 @@ var options = {
 map = new google.maps.Map(document.getElementById('mapa'), options);
 
 $("#nuevo_tubo").click(draw_tubo);
-
-
+$("#eliminar_tubo").click(eliminar_tubo);
 
 });
