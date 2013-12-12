@@ -37,20 +37,16 @@ function point_tostr(tubo){
 }
 
 function guardar_tubo(id,tubo){
-	str = point_tostr(tubo);
-	if(id == 0){
-		console.log("Creando :"+str);		
-		++id_count;
-		console.log("Id: "+id_count);
-		return id_count;
-	}
-	else{
-		console.log("actualizando "+str);
-		console.log("Id: "+id);
-		return id;
-	}
-
-	
+	console.log("porque");
+	p1 = "" + tubo.getPath().getAt(0);
+	p2 = "" + tubo.getPath().getAt(1)
+	var remote = $.ajax({
+	    type: "GET",
+	    url: "guardar_tubo/?"+"id="+id+"&p1="+p1+"&p2="+p2,
+	    async: false
+	}).responseText;
+	console.log(remote);
+	return remote;
 }
 
 function select_tubo(id,polyline){
