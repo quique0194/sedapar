@@ -50,17 +50,18 @@ function guardar_tubo(id,tubo){
 
 function select_tubo(id,polyline){
 	if(selected){
-		if( selected == polyline )
+		if( selected == polyline ){
+			selected_id = id;
 			return;
+		}
 		selected.set('strokeColor', unselected_color);
-		selected.setDraggable(false);
 		selected.setEditable(false);		
 	}
 	selected = polyline;
 	selected_id = id;
 	selected.set('strokeColor', selected_color);
-	selected.setDraggable(true);
 	selected.setEditable(true); 
+	console.log("selected id: "+selected_id);
 }
 
 function make_selectable(id, tubo){
@@ -76,21 +77,38 @@ function make_editable(id, tubo){
 		guardar_tubo(id,tubo);
 	});
 
-	var add_node_listener = google.maps.event.addListener(tubo.getPath(), 'insert_at', function(i){
+	var path = tubo.getPath();
+	var add_node_listener = google.maps.event.addListener(path, 'insert_at', function(i){
 		if( confirm("Dividir en 2 tubos?") ){
+			console.log(1);
 			ntubo = crear_tubo();
-			v3 = tubo.getPath().pop();
-			v2 = tubo.getPath().pop();
-			tubo.getPath().push(v2);
-			ntubo.getPath().push(v2);
+			console.log(2);
+			var v3 = path.pop();
+			console.log(4);
+			ntubo.getPath().push(path.getAt(1));
+			console.log(5);
 			ntubo.getPath().push(v3);
+			console.log(1);
+			guardar_tubo(id,tubo);
+			console.log(7);
+			nid = guardar_tubo(0,ntubo);
+			console.log(1);
+			make_selectable(nid,ntubo);
+			console.log(9);
+			make_editable(nid,ntubo);
+			console.log(1);
+		}
+		else{
+			console.log("antes");
+			tubo.getPath().removeAt(1);
+			console.log("despues");
 		}
 	});
 }
 
 function draw_tubo(){
+	$("#nuevo_tubo").attr('disabled', true);
 	var polyline = crear_tubo();
-	make_selectable(0,polyline);
 	select_tubo(0,polyline);
 
 	var listener_click = google.maps.event.addListener(map, 'click', function(e){
@@ -109,7 +127,10 @@ function draw_tubo(){
 			google.maps.event.removeListener(listener_move);
 			google.maps.event.removeListener(listener_click);
 			var nid = guardar_tubo(0,polyline);
+			make_selectable(nid,polyline);
 			make_editable(nid,polyline);
+			select_tubo(nid,polyline);
+			$("#nuevo_tubo").removeAttr('disabled');
 		});
 
 	});
