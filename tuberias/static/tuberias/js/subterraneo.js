@@ -32,7 +32,7 @@ function init() {
 
     // cubes
 
-    cubeGeo = new THREE.CubeGeometry( 40, 40, 40 );
+    cubeGeo = new THREE.CubeGeometry( 20, 20, 20 );
     cubeMaterial = new THREE.MeshLambertMaterial( { color: 0x922929, ambient: 0x00ff80, shading: THREE.FlatShading} );
     cubeMaterial.ambient = cubeMaterial.color;
 
@@ -42,7 +42,7 @@ function init() {
 
     // grid
 
-    var size = 400, step = 40;
+    var size = 400, step = 20;
 
     var geometry = new THREE.Geometry();
 
@@ -82,10 +82,43 @@ function init() {
     renderer.setClearColor( 0xf0f0f0 );
     renderer.setSize( canvasWidth, canvasHeight );
 
+    
+    var vectorLatitud = new Array(6);
+    var vectorLongitud = new Array(6);
+    vectorLatitud[0] = 0.0;
+    vectorLongitud[0] = 0.0;
+    vectorLatitud[1] = 320.0;
+    vectorLongitud[1] = 0.0;
+    vectorLatitud[2] = 320.0;
+    vectorLongitud[2] = -80.0;
+    vectorLatitud[3] = 0.0;
+    vectorLongitud[3] = -80.0;
+
+
+
+    for (var i = 0 ; i < vectorLatitud[1]; i=i+20.0) {
+        var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
+        voxel.position.set(i, 0.0, 0.0);
+        scene.add(voxel);   
+    };
+
+    for (var i = 0 ; i > vectorLongitud[2]; i=i-20.0) {
+        var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
+        voxel.position.set(vectorLatitud[2], 0.0, i);
+        scene.add(voxel);   
+    };
+
+    for (var i = 320 ; i >= vectorLatitud[3]; i=i-20.0) {
+        var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
+        voxel.position.set(i, 0.0, vectorLongitud[3]);
+        scene.add(voxel);   
+    };
+    
+
     document.getElementById("subterraneo").appendChild(renderer.domElement);
     
-    document.addEventListener( 'mousemove', onDocumentMouseMove, false );
-    document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+    document.getElementById("subterraneo").addEventListener( 'mousemove', onDocumentMouseMove, false );
+    document.getElementById("subterraneo").addEventListener( 'mousedown', onDocumentMouseDown, false );
     document.addEventListener( 'keydown', onDocumentKeyDown, false );
     document.addEventListener( 'keyup', onDocumentKeyUp, false );
 
@@ -140,14 +173,15 @@ function setVoxelPosition( intersector ) {
 function onDocumentMouseMove( event ) {
 
     event.preventDefault();
-
-    mouse2D.x = ( event.clientX / canvasWidth ) * 2 - 1;
-    mouse2D.y = - ( event.clientY / canvasHeight ) * 2 + 1;
+    var offset = $("#subterraneo").offset();
+    mouse2D.x = ( (event.clientX - offset.left) / canvasWidth ) * 2 - 1;
+    mouse2D.y = - ( (event.clientY - offset.top) / canvasHeight ) * 2 + 1;
+    console.log(mouse2D.x);
 
 }
 
 function onDocumentMouseDown( event ) {
-
+    console.log("MouseDown");
     event.preventDefault();
 
     var intersects = raycaster.intersectObjects( scene.children );
@@ -185,7 +219,7 @@ function onDocumentMouseDown( event ) {
 }
 
 function onDocumentKeyDown( event ) {
-
+    console.log("keyDown");
     switch( event.keyCode ) {
 
         case 16: isShiftDown = true; break;
@@ -196,7 +230,7 @@ function onDocumentKeyDown( event ) {
 }
 
 function onDocumentKeyUp( event ) {
-
+    console.log("keyDown");
     switch ( event.keyCode ) {
 
         case 16: isShiftDown = false; break;
@@ -209,6 +243,7 @@ function onDocumentKeyUp( event ) {
     //
 
     function animate() {
+    //console.log("animate");
 
         requestAnimationFrame( animate );
 
@@ -218,7 +253,11 @@ function onDocumentKeyUp( event ) {
 
     function render() {
 
+        //console.log("render");
+
+
         if ( isShiftDown ) {
+            console.log("shit");
 
             theta += mouse2D.x * 1.5;
 
@@ -258,3 +297,4 @@ function onDocumentKeyUp( event ) {
 $(window).load(function(){
     webGLStart();
 });
+
