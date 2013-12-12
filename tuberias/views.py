@@ -2,7 +2,8 @@ from django.shortcuts import render
 from django.views.generic import TemplateView
 from django.http import HttpResponse
 from django.utils import simplejson
-
+from django.contrib.gis.geos import GEOSGeometry, LineString
+from tuberias.models import Tubo
 
 class IndexView(TemplateView):
 	template_name = "tuberias/index.html"
@@ -10,27 +11,34 @@ class IndexView(TemplateView):
 def mapa(request):
 	if request.method == 'GET':
 		GET = request.GET
-		if GET.has_key('nro1') and GET.has_key('nro2'):
-			nro1 = int(GET['nro1'])
-			nro2 = int(GET['nro2'])
-			suma = nro1 + nro2
-			rpta = {'rpta':suma}
-			json = simplejson.dumps(rpta)
-			return HttpResponse(json)
+		tubos = Tubo.objects.all()
+		json ="""{ "tubos":["""
+		for tubo in tubos:
+			json += '{ "id":"'+str(tubo.id)+'" ,"tubo":'+tubo.tubo.json+ '},'
+		json = json[:-1]
+		json += "]}"
+		print "JSON: "+json
+		return HttpResponse(json)
 
-
-cont = 1;
 
 def guardar_tubo(request):
 	if request.method == 'GET':
 		GET = request.GET
 		if GET.has_key('id') and GET.has_key('p1') and GET.has_key('p2'):
 			id = int(GET['id'])
-			print "id: " + str(id)
+			p1 = GEOSGeometry(GET['p1'])
+			p2 = GEOSGeometry(GET['p2'])
 			if id == 0:
-				print "hola if"
-				global cont;
-				id = cont
-				print "no mori"
-				cont = cont + 1
-			return HttpResponse(id)
+				tubo = Tubo(radio=1)
+				tubo.tubo = LineString(p1, p2)
+				tubo.save()
+			else:
+				tubo = Tubo.objects.get(pk=id)
+				tubo.tubo = LineString(p1, p2)
+				tubo.save()
+			rpta = {'id':tubo.id}
+			json = simplejson.dumps(rpta)
+			return HttpResponse(json)
+
+def eliminar_tubo(request):
+	return HttpResponse()

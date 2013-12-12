@@ -36,20 +36,26 @@ function point_tostr(tubo){
 	return str;
 }
 
+function point_towkt(point){
+	str = "POINT(" + point.lat() + " " + point.lng()+")";
+	return str;
+}
+
 function guardar_tubo(id,tubo){
-	console.log("porque");
-	p1 = "" + tubo.getPath().getAt(0);
-	p2 = "" + tubo.getPath().getAt(1)
+	p1 = point_towkt(tubo.getPath().getAt(0));
+	p2 = point_towkt(tubo.getPath().getAt(1));
 	var remote = $.ajax({
 	    type: "GET",
 	    url: "guardar_tubo/?"+"id="+id+"&p1="+p1+"&p2="+p2,
 	    async: false
 	}).responseText;
-	console.log(remote);
-	return remote;
+	var json = $.parseJSON(remote);
+	console.log("guardado id: "+json.id);
+	return json.id;
 }
 
 function select_tubo(id,polyline){
+	console.log("selected id: "+id);
 	if(selected){
 		if( selected == polyline ){
 			selected_id = id;
@@ -61,8 +67,7 @@ function select_tubo(id,polyline){
 	selected = polyline;
 	selected_id = id;
 	selected.set('strokeColor', selected_color);
-	selected.setEditable(true); 
-	console.log("selected id: "+selected_id);
+	selected.setEditable(true); 	
 }
 
 function make_selectable(id, tubo){
@@ -80,7 +85,6 @@ function make_editable(id, tubo){
 
 	var add_node_listener = google.maps.event.addListener(tubo.getPath(), 'insert_at', function(i){
 		var path = tubo.getPath();
-		console.log("kike es: "+point_tostr(tubo));
 		if( confirm("Dividir en 2 tubos?") ){
 			hide_tubo(tubo);
 			var tubo1 = crear_tubo();
@@ -144,6 +148,8 @@ function hide_tubo(tubo){
 	tubo.setVisible(false);
 }
 
+
+
 function eliminar_tubo(){
 	if(selected){
 		if(selected.getVisible() ){
@@ -155,6 +161,23 @@ function eliminar_tubo(){
 	}
 }
 
+function draw_pre_tubo(id, linestring){
+	polyline = crear_tubo();
+	$.each(linestring.coordinates, function(i, val){
+		var pnt = new google.maps.LatLng(val[0], val[1], false);
+		polyline.getPath().push(pnt);
+	});
+	make_selectable(id, polyline);
+	make_editable(id, polyline);
+}
+
+function cargar_tubos(){
+	$.getJSON("mapa/", "", function(json){
+		$.each(json.tubos, function(i, val){
+			draw_pre_tubo(val.id,val.tubo);
+		});
+	});
+}
 
 // document ready
 
@@ -173,5 +196,7 @@ map = new google.maps.Map(document.getElementById('mapa'), options);
 
 $("#nuevo_tubo").click(draw_tubo);
 $("#eliminar_tubo").click(eliminar_tubo);
+
+cargar_tubos();
 
 });
