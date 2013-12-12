@@ -7,20 +7,8 @@ var selected;
 
 // functions 
 
-function select_tubo(polyline){
-	if(selected){
-		selected.set('strokeColor', unselected_color);
-		selected.setDraggable(false);
-		selected.setEditable(false);
-	}
-	selected = polyline;
-	selected.set('strokeColor', selected_color);
-	selected.setDraggable(true);
-	selected.setEditable(true);
-}
-
-function nuevo_tubo(){
-
+function crear_tubo(){
+	
 	var routes = new google.maps.MVCArray();
 
 	var polyline = new google.maps.Polyline({
@@ -36,6 +24,45 @@ function nuevo_tubo(){
 		select_tubo(polyline);
 	});
 
+	return polyline;
+}
+
+function select_tubo(polyline){
+	if(selected){
+		selected.set('strokeColor', unselected_color);
+		selected.setDraggable(false);
+		selected.setEditable(false);
+		google.maps.event.removeListener(edit_listener);
+	}
+	selected = polyline;
+	selected.set('strokeColor', selected_color);
+	selected.setDraggable(true);
+	selected.setEditable(true);
+	var edit_listener = google.maps.event.addListener(selected, 'mouseover', function(){
+		var path = selected.getPath();
+		if( path.getLength() == 3 )
+			if( confirm("Desea dividir el tubo en 2?") ){
+				ultimo = selected.getPath().pop();
+				medio = selected.getPath().pop();
+				n = crear_tubo();
+				selected.getPath().push(medio);
+				n.getPath().push(medio);
+				n.getPath().push(ultimo);
+			}
+			else{
+				ultimo = selected.getPath().pop();
+				medio = selected.getPath().pop();
+				selected.getPath().push(ultimo);
+			}
+			
+	});
+}
+
+
+
+function draw_tubo(){
+	var polyline = crear_tubo();
+
 	var listener_click = google.maps.event.addListener(map, 'click', function(e){
 		select_tubo(polyline);
 		var path = polyline.getPath();
@@ -49,7 +76,6 @@ function nuevo_tubo(){
 		});
 
 		var listener_click2 = google.maps.event.addListener(polyline, 'click', function(c){
-			console.log("he sido derrotado");
 			str = "";
 			path.forEach(function(item){
 				str += item;
@@ -80,7 +106,7 @@ var options = {
 
 map = new google.maps.Map(document.getElementById('mapa'), options);
 
-$("#nuevo_tubo").click(nuevo_tubo);
+$("#nuevo_tubo").click(draw_tubo);
 
 
 
