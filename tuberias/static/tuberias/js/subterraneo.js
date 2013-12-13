@@ -274,7 +274,7 @@ function onDocumentKeyUp( event ) {
     function graficar_tuberia(x1,y1,x2,y2)
     {
         console.log("graficando tuberia");
-        cilindroGeo = new THREE.CylinderGeometry(10, 10, 300, 20, 20, false);
+        cilindroGeo = new THREE.CylinderGeometry(10, 10, tamaño_tubo(x1,y1,x2,y2), 20, 20, false);
         cilindroMaterial = new THREE.MeshNormalMaterial();
         var cilindro = new THREE.Mesh(cilindroGeo,cilindroMaterial);
         cilindro.overdraw = true;
@@ -283,6 +283,10 @@ function onDocumentKeyUp( event ) {
         scene.add(cilindro);
         cont+=20;
 
+    }
+    function tamaño_tubo(x1,y1,x2,y2)
+    {
+        return Math.sqrt(Math.pow((x2-x1),2)+Math.pow((y2-y1),2));
     }
 
     function clear_scene()
