@@ -130,9 +130,9 @@ function make_editable(id, tubo){
 function draw_tubo(){
 	$("#nuevo_tubo").attr('disabled', true);
 	$("#eliminar_tubo").attr('disabled', true);
-	var polyline = crear_tubo();
 
 	var listener_click = google.maps.event.addListener(map, 'click', function(e){
+		var polyline = crear_tubo();
 		select_tubo(0,polyline);
 		var path = polyline.getPath();
 		path.push(e.latLng);
