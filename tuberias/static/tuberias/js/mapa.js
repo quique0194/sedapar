@@ -12,6 +12,7 @@ var map;
 
 var polylines = new Array();
 
+var coorTuberias;
 // functions 
 
 function clear_map(){
@@ -195,15 +196,52 @@ function cargar_tubos(){
 	var max_lat = map.getBounds().getNorthEast().lat();
 	var min_lng = map.getBounds().getSouthWest().lng();
 	var max_lng = map.getBounds().getNorthEast().lng();
-	console.log((max_lat-min_lat)*10000000000000000000);
-	console.log((max_lng-min_lng)*10000000000000000000);
+	var center_lat = map.getCenter().lat();
+	var center_lng = map.getCenter().lng();
+
+	console.log("clat: " + center_lat);
+	console.log("clng: " + center_lng);
 	data = {min_lat:min_lat, max_lat:max_lat, min_lng:min_lng, max_lng:max_lng};
 	$.getJSON("mapa/", data, function(json){
 		$.each(json.tubos, function(i, val){
 			draw_pre_tubo(val.id,val.tubo);
 		});
+		vista3D(json , center_lat,center_lng);
 	});
+	clear_scene();
 }
+function vista3D(tubos, center_lat, center_lng)
+{
+	cont = 0;
+
+	/*$.each(tubos.tubos, function(i, val){
+			console.log((val.tubo.coordinates[0][0]*10000000000000000 - center_lat*10000000000000000) %500);
+			console.log((val.tubo.coordinates[0][1]*10000000000000000 - center_lng*10000000000000000) %500);
+			console.log((val.tubo.coordinates[1][0]*10000000000000000 - center_lat*10000000000000000) %500);
+			console.log((val.tubo.coordinates[1][1]*10000000000000000 - center_lng*10000000000000000) %500);
+			console.log("....................");
+		});
+	console.log("----------------------------");*/
+
+	$.each(tubos.tubos, function(i, val){
+			graficar_tuberia(normalizarCoordenadas(val.tubo.coordinates[0][0] - center_lat) ,
+				normalizarCoordenadas(val.tubo.coordinates[0][1] - center_lng),
+				normalizarCoordenadas(val.tubo.coordinates[1][0] - center_lat),
+				normalizarCoordenadas(val.tubo.coordinates[1][1] - center_lng)
+				)
+
+
+		});
+	animate();
+}
+
+
+function normalizarCoordenadas(coordenada)
+{
+	return (coordenada*10000000000000000) %500;
+}
+
+
 
 // document ready
 

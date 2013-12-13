@@ -14,6 +14,8 @@ var voxelPosition = new THREE.Vector3(), tmpVec = new THREE.Vector3(), normalMat
 var cubeGeo, cubeMaterial;
 var i, intersector;
 
+var cont = 0;
+
 
 function convertir(punto)
 {
@@ -28,13 +30,6 @@ function init() {
     camera.position.y = 800;
 
     scene = new THREE.Scene();
-
-    // roll-over helpers
-
-    rollOverGeo = new THREE.CubeGeometry( 20, 20, 20 );
-    rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
-    rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
-    scene.add( rollOverMesh );
 
     // cubes
 
@@ -119,7 +114,7 @@ function init() {
     document.getElementById("subterraneo").appendChild(renderer.domElement);
     
     document.getElementById("subterraneo").addEventListener( 'mousemove', onDocumentMouseMove, false );
-    document.getElementById("subterraneo").addEventListener( 'mousedown', onDocumentMouseDown, false );
+    //document.getElementById("subterraneo").addEventListener( 'mousedown', onDocumentMouseDown, false );
     document.addEventListener( 'keydown', onDocumentKeyDown, false );
     document.addEventListener( 'keyup', onDocumentKeyUp, false );
 
@@ -177,11 +172,11 @@ function onDocumentMouseMove( event ) {
     var offset = $("#subterraneo").offset();
     mouse2D.x = ( (event.clientX - offset.left) / canvasWidth ) * 2 - 1;
     mouse2D.y = - ( (event.clientY - offset.top) / canvasHeight ) * 2 + 1;
-    console.log(mouse2D.x);
+    //console.log(mouse2D.x);
 
 }
 
-function onDocumentMouseDown( event ) {
+/*function onDocumentMouseDown( event ) {
     console.log("MouseDown");
     event.preventDefault();
 
@@ -217,7 +212,7 @@ function onDocumentMouseDown( event ) {
         }
 
     }
-}
+}*/
 
 function onDocumentKeyDown( event ) {
     console.log("keyDown");
@@ -244,8 +239,7 @@ function onDocumentKeyUp( event ) {
     //
 
     function animate() {
-    //console.log("animate");
-
+        //console.log("animate");
         requestAnimationFrame( animate );
 
         render();
@@ -266,19 +260,7 @@ function onDocumentKeyUp( event ) {
 
         raycaster = projector.pickingRay( mouse2D.clone(), camera );
 
-        var intersects = raycaster.intersectObjects( scene.children );
-
-        if ( intersects.length > 0 ) {
-
-            intersector = getRealIntersector( intersects );
-            if ( intersector ) {
-
-                setVoxelPosition( intersector );
-                rollOverMesh.position = voxelPosition;
-
-            }
-
-        }
+        
 
         camera.position.x = 1400 * Math.sin( THREE.Math.degToRad( theta ) );
         camera.position.z = 1400 * Math.cos( THREE.Math.degToRad( theta ) );
@@ -288,15 +270,34 @@ function onDocumentKeyUp( event ) {
         renderer.render( scene, camera );
 
     }
+
+    function graficar_tuberia(x1,y1,x2,y2)
+    {
+        console.log("graficando tuberia");
+        cilindroGeo = new THREE.CylinderGeometry(10, 10, 300, 20, 20, false);
+        cilindroMaterial = new THREE.MeshNormalMaterial();
+        var cilindro = new THREE.Mesh(cilindroGeo,cilindroMaterial);
+        cilindro.overdraw = true;
+        cilindro.position.set(cont,0,0);
+        cilindro.rotation.x = 1.55;
+        scene.add(cilindro);
+        cont+=20;
+
+    }
+
+    function clear_scene()
+    {
+        scene = new THREE.Scene();
+    }
+
     function webGLStart()
     {
         init();
-        animate();
+        //animate();
     }
 
 
 $(window).load(function(){
     webGLStart();
-    convertir(-16.39880241990732);
 });
 
