@@ -25,7 +25,7 @@ function init() {
 
     // roll-over helpers
 
-    rollOverGeo = new THREE.CubeGeometry( 40, 40, 40 );
+    rollOverGeo = new THREE.CubeGeometry( 20, 20, 20 );
     rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0xff0000, opacity: 0.5, transparent: true } );
     rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
     scene.add( rollOverMesh );
