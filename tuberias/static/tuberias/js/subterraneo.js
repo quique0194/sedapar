@@ -15,6 +15,12 @@ var cubeGeo, cubeMaterial;
 var i, intersector;
 
 
+function convertir(punto)
+{
+    var temp = punto*100000000000000;
+    console.log(temp);
+}
+
 function init() {
 
 
@@ -32,9 +38,34 @@ function init() {
 
     // cubes
 
-    cubeGeo = new THREE.CubeGeometry( 20, 20, 20 );
+    cubeGeo = new THREE.CubeGeometry( 30, 30, 30 );
     cubeMaterial = new THREE.MeshLambertMaterial( { color: 0x922929, ambient: 0x00ff80, shading: THREE.FlatShading} );
     cubeMaterial.ambient = cubeMaterial.color;
+
+
+    cilindroGeo = new THREE.CylinderGeometry(10, 10, 300, 20, 20, false);
+    cilindroMaterial = new THREE.MeshNormalMaterial();
+    var cilindro = new THREE.Mesh(cilindroGeo,cilindroMaterial);
+    cilindro.overdraw = true;
+    cilindro.position.set(0,0,0);
+    cilindro.rotation.x = 1.55;
+    scene.add(cilindro);
+
+
+
+    cilindroGeo2 = new THREE.CylinderGeometry(10, 10, 300, 20, 20, false);
+    cilindroMaterial2 = new THREE.MeshNormalMaterial();
+    var cilindro2 = new THREE.Mesh(cilindroGeo,cilindroMaterial);
+    cilindro2.overdraw = true;
+    cilindro2.position.set(150,0,150);
+    cilindro2.rotation.x = 1.55;
+    cilindro2.rotation.z = 1.55;
+    scene.add(cilindro2);
+
+    var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
+        voxel.position.set(0, 0.0, 150);
+        scene.add(voxel); 
+
 
     // picking
 
@@ -83,37 +114,7 @@ function init() {
     renderer.setSize( canvasWidth, canvasHeight );
 
     
-    var vectorLatitud = new Array(6);
-    var vectorLongitud = new Array(6);
-    vectorLatitud[0] = 0.0;
-    vectorLongitud[0] = 0.0;
-    vectorLatitud[1] = 320.0;
-    vectorLongitud[1] = 0.0;
-    vectorLatitud[2] = 320.0;
-    vectorLongitud[2] = -80.0;
-    vectorLatitud[3] = 0.0;
-    vectorLongitud[3] = -80.0;
 
-
-
-    for (var i = 0 ; i < vectorLatitud[1]; i=i+20.0) {
-        var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
-        voxel.position.set(i, 0.0, 0.0);
-        scene.add(voxel);   
-    };
-
-    for (var i = 0 ; i > vectorLongitud[2]; i=i-20.0) {
-        var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
-        voxel.position.set(vectorLatitud[2], 0.0, i);
-        scene.add(voxel);   
-    };
-
-    for (var i = 320 ; i >= vectorLatitud[3]; i=i-20.0) {
-        var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
-        voxel.position.set(i, 0.0, vectorLongitud[3]);
-        scene.add(voxel);   
-    };
-    
 
     document.getElementById("subterraneo").appendChild(renderer.domElement);
     
@@ -296,5 +297,6 @@ function onDocumentKeyUp( event ) {
 
 $(window).load(function(){
     webGLStart();
+    convertir(-16.39880241990732);
 });
 

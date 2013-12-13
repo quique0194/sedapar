@@ -195,6 +195,8 @@ function cargar_tubos(){
 	var max_lat = map.getBounds().getNorthEast().lat();
 	var min_lng = map.getBounds().getSouthWest().lng();
 	var max_lng = map.getBounds().getNorthEast().lng();
+	console.log((max_lat-min_lat)*10000000000000000000);
+	console.log((max_lng-min_lng)*10000000000000000000);
 	data = {min_lat:min_lat, max_lat:max_lat, min_lng:min_lng, max_lng:max_lng};
 	$.getJSON("mapa/", data, function(json){
 		$.each(json.tubos, function(i, val){
