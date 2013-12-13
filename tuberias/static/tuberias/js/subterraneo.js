@@ -5,7 +5,7 @@ var camera, scene, renderer;
 var projector, plane, cube;
 var mouse2D, mouse3D, raycaster,
 rollOveredFace, isShiftDown = false,
-theta = 45 * 0.5, isCtrlDown = false;
+theta = 300, isCtrlDown = false;
 var canvasWidth = 540;
 var canvasHeight = 600;
 
@@ -28,6 +28,8 @@ function init() {
 
     camera = new THREE.PerspectiveCamera( 45, canvasWidth / canvasHeight, 1, 10000 );
     camera.position.y = 800;
+    camera.position.x = 1400 * Math.sin( THREE.Math.degToRad( theta ) );
+        camera.position.z = 1400 * Math.cos( THREE.Math.degToRad( theta ) );
 
     scene = new THREE.Scene();
 
@@ -261,7 +263,7 @@ function onDocumentKeyUp( event ) {
         raycaster = projector.pickingRay( mouse2D.clone(), camera );
 
         
-
+        //console.log(theta);
         camera.position.x = 1400 * Math.sin( THREE.Math.degToRad( theta ) );
         camera.position.z = 1400 * Math.cos( THREE.Math.degToRad( theta ) );
 
@@ -278,7 +280,7 @@ function onDocumentKeyUp( event ) {
         cilindroMaterial = new THREE.MeshNormalMaterial();
         var cilindro = new THREE.Mesh(cilindroGeo,cilindroMaterial);
         cilindro.overdraw = true;
-        cilindro.position.set(cont,0,0);
+        cilindro.position.set((x1+x2)/2,0,(y1+y2)/2);
         cilindro.rotation.x = 1.55;
         scene.add(cilindro);
         cont+=20;

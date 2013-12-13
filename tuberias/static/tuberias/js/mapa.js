@@ -238,7 +238,7 @@ function vista3D(tubos, center_lat, center_lng)
 
 function normalizarCoordenadas(coordenada)
 {
-	return (coordenada*10000000000000000) %500;
+	return (coordenada*200000) ;
 }
 
 
