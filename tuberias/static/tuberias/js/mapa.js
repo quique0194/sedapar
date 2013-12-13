@@ -10,7 +10,16 @@ var id_count = 0;
 
 var map;
 
+var polylines = new Array();
+
 // functions 
+
+function clear_map(){
+	polylines.forEach( function(elem){
+		elem.setMap(null);
+	});
+	polylines = new Array();
+}
 
 function crear_tubo(){
 	
@@ -25,6 +34,7 @@ function crear_tubo(){
 		, clickable: true
 	});
 
+	polylines.push(polyline);
 	return polyline;
 }
 
@@ -89,7 +99,7 @@ function make_editable(id, tubo){
 	var add_node_listener = google.maps.event.addListener(tubo.getPath(), 'insert_at', function(i){
 		var path = tubo.getPath();
 		if( confirm("Dividir en 2 tubos?") ){
-			hide_tubo(tubo);
+			tubo.setMap(null);
 			var tubo1 = crear_tubo();
 			var tubo2 = crear_tubo();
 			tubo1.getPath().push(path.getAt(0));
@@ -105,7 +115,7 @@ function make_editable(id, tubo){
 			select_tubo(id, tubo1);
 		}
 		else{
-			hide_tubo(tubo);
+			tubo.setMap(null);
 			var tubo1 = crear_tubo();
 			tubo1.getPath().push(path.getAt(0));
 			tubo1.getPath().push(path.getAt(2));
@@ -148,11 +158,6 @@ function draw_tubo(){
 	});
 }
 
-function hide_tubo(tubo){
-	tubo.setVisible(false);
-}
-
-
 
 function eliminar_tubo(){
 	if(selected){
@@ -163,7 +168,7 @@ function eliminar_tubo(){
 				    url: "eliminar_tubo/?"+"id="+selected_id,
 				    async: false
 				})
-				hide_tubo(selected);
+				selected.setMap(null);
 				console.log("eliminado id: "+selected_id);
 				selected = null;
 				selected_id = null;
@@ -185,7 +190,13 @@ function draw_pre_tubo(id, linestring){
 }
 
 function cargar_tubos(){
-	$.getJSON("mapa/", "", function(json){
+	clear_map();
+	var min_lat = map.getBounds().getSouthWest().lat();
+	var max_lat = map.getBounds().getNorthEast().lat();
+	var min_lng = map.getBounds().getSouthWest().lng();
+	var max_lng = map.getBounds().getNorthEast().lng();
+	data = {min_lat:min_lat, max_lat:max_lat, min_lng:min_lng, max_lng:max_lng};
+	$.getJSON("mapa/", data, function(json){
 		$.each(json.tubos, function(i, val){
 			draw_pre_tubo(val.id,val.tubo);
 		});
@@ -211,6 +222,9 @@ $("#nuevo_tubo").click(draw_tubo);
 $("#eliminar_tubo").click(eliminar_tubo);
 $("#eliminar_tubo").attr('disabled', true);
 
-cargar_tubos();
+
+google.maps.event.addListener(map, 'idle', function(){
+		cargar_tubos();
+});
 
 });
