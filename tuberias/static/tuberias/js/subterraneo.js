@@ -282,6 +282,11 @@ function onDocumentKeyUp( event ) {
         cilindro.overdraw = true;
         cilindro.position.set((x1+x2)/2,0,(y1+y2)/2);
         cilindro.rotation.x = 1.55;
+        if (Math.abs(giro_tubo(x1,y1,x2,y2)) <2) 
+        {
+            cilindro.rotation.z = 1.55;
+        }
+        //giro_tubo(x1,x2);
         scene.add(cilindro);
         cont+=20;
 
@@ -289,6 +294,17 @@ function onDocumentKeyUp( event ) {
     function tamaño_tubo(x1,y1,x2,y2)
     {
         return Math.sqrt(Math.pow((x2-x1),2)+Math.pow((y2-y1),2));
+    }
+
+    function giro_tubo(x1,y1,x2,y2)
+    {
+        var pendiente = (y2-y1)/(x2-x1);
+        var angulo = Math.atan(pendiente);
+
+        var tmp = 1.55 * (Math.abs(y1-y2)/400);
+        var t = 1.55 * (angulo/(Math.PI/2));
+        console.log("diferencia:" + pendiente);
+        return pendiente;
     }
 
     function clear_scene()
